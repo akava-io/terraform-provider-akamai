@@ -99,7 +99,7 @@ func (configurationclone *ConfigurationCloneResponse) GetConfigurationClone(corr
 // API Docs: // appsec v1
 //
 // https://developer.akamai.com/api/cloud_security/application_security/v1.html#postconfigurationclone
-func (configurationclone *ConfigurationCloneResponse) Save(postpayload *ConfigurationClonePost, correlationid string) error {
+func (configurationclone *ConfigurationCloneResponse) Save(postpayload *ConfigurationClonePost, correlationid string) (*ConfigurationCloneResponse, error) {
 	req, err := client.NewJSONRequest(
 		Config,
 		"POST",
@@ -110,24 +110,25 @@ func (configurationclone *ConfigurationCloneResponse) Save(postpayload *Configur
 		postpayload,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	edge.PrintHttpRequestCorrelation(req, true, correlationid)
 
 	res, err := client.Do(Config, req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	edge.PrintHttpResponseCorrelation(res, true, correlationid)
 
 	if client.IsError(res) {
-		return client.NewAPIError(res)
+		return nil, client.NewAPIError(res)
 	}
-	if err = client.BodyJSON(res, configurationclone); err != nil {
-		return err
+	ccr := &ConfigurationCloneResponse{}
+	if err = client.BodyJSON(res, ccr); err != nil {
+		return nil, err
 	}
 
-	return nil
+	return ccr, nil
 }
