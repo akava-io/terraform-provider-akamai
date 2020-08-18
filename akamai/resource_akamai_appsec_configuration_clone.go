@@ -20,24 +20,19 @@ func resourceConfigurationClone() *schema.Resource {
 		Update: resourceConfigurationCloneUpdate,
 		Delete: resourceConfigurationCloneDelete,
 		Schema: map[string]*schema.Schema{
-			"configid": {
+			"config_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"createfromversion": {
-				Type:             schema.TypeInt,
-				Required:         true,
-				DiffSuppressFunc: suppressConfigurationCloneVersion,
+			"create_from_version": {
+				Type:     schema.TypeInt,
+				Required: true,
 			},
 
-			"ruleupdate": &schema.Schema{
+			"rule_update": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
-			},
-			"version": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
 			},
 		},
 	}
@@ -50,16 +45,14 @@ func resourceConfigurationCloneCreate(d *schema.ResourceData, meta interface{}) 
 
 	configurationclone := appsec.NewConfigurationCloneResponse()
 	configurationclonepost := appsec.NewConfigurationClonePost()
-	configurationclone.ConfigID = d.Get("configid").(int)
-	configurationclonepost.CreateFromVersion = d.Get("createfromversion").(int)
-	edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("CREATE NEW VERSION FROM  %d\n", configurationclonepost.CreateFromVersion))
+	configurationclone.ConfigID = d.Get("config_id").(int)
+	configurationclonepost.CreateFromVersion = d.Get("create_from_version").(int)
 	err := configurationclone.Save(configurationclonepost, CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
-		return nil
+		return err
 	}
-	//d.SetId(configurationclone.ID)
-	d.Set("version", configurationclone.Version)
+
 	return resourceConfigurationCloneRead(d, meta)
 }
 
@@ -68,15 +61,14 @@ func resourceConfigurationCloneRead(d *schema.ResourceData, meta interface{}) er
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Read ConfigurationClone")
 
 	configurationclone := appsec.NewConfigurationCloneResponse()
-	configurationclone.ConfigID = d.Get("configid").(int)
-	configurationclone.Version = d.Get("createfromversion").(int)
+	configurationclone.ConfigID = d.Get("config_id").(int)
+	configurationclone.Version = d.Get("create_from_version").(int)
 	err := configurationclone.GetConfigurationClone(CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
-		return nil
+		return err
 	}
-	edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("NEW VERSION  %d\n", configurationclone.Version))
-	//d.Set("version", configurationclone.Version)
+
 	d.SetId(strconv.Itoa(configurationclone.ConfigID))
 	return nil
 }

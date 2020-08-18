@@ -37,8 +37,8 @@ data "akamai_appsec_configuration" "appsecconfigedge" {
 }
 
 data "akamai_appsec_export_configuration" "appsecexportconfiguration" {
-   configid = data.akamai_appsec_configuration.appsecconfigedge.configid
-   version  = data.akamai_appsec_configuration.appsecconfigedge.latestversion 
+   config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+   version  = data.akamai_appsec_configuration.appsecconfigedge.latest_version 
 }
 
 

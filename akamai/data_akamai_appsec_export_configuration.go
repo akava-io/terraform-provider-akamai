@@ -14,15 +14,15 @@ func dataSourceExportConfiguration() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceExportConfigurationRead,
 		Schema: map[string]*schema.Schema{
-			"configid": {
+			"config_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"version": &schema.Schema{
+			"version": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"json": &schema.Schema{
+			"json": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "JSON Export representation",
@@ -36,9 +36,8 @@ func dataSourceExportConfigurationRead(d *schema.ResourceData, meta interface{})
 
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Read ExportConfiguration")
 
-	//edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("configid  %d version %d\n", configID, version))
 	exportconfiguration := appsec.NewExportConfigurationResponse()
-	exportconfiguration.ConfigID = d.Get("configid").(int)
+	exportconfiguration.ConfigID = d.Get("config_id").(int)
 	exportconfiguration.Version = d.Get("version").(int)
 
 	err := exportconfiguration.GetExportConfiguration(CorrelationID)
@@ -55,7 +54,6 @@ func dataSourceExportConfigurationRead(d *schema.ResourceData, meta interface{})
 	}
 
 	d.Set("json", string(jsonBody))
-
 	d.SetId(strconv.Itoa(exportconfiguration.ConfigID))
 
 	return nil

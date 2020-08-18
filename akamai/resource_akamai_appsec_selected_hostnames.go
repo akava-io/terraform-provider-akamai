@@ -20,16 +20,16 @@ func resourceSelectedHostnames() *schema.Resource {
 		Update: resourceSelectedHostnamesUpdate,
 		Delete: resourceSelectedHostnamesDelete,
 		Schema: map[string]*schema.Schema{
-			"configid": {
+			"config_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"version": &schema.Schema{
+			"version": {
 				Type:             schema.TypeInt,
 				Required:         true,
 				DiffSuppressFunc: suppressConfigurationCloneVersion,
 			},
-			"hostnames": &schema.Schema{
+			"host_names": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -43,7 +43,7 @@ func resourceSelectedHostnamesRead(d *schema.ResourceData, meta interface{}) err
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Read SelectedHostnames")
 
 	selectedhostnames := appsec.NewSelectedHostnamesResponse()
-	configid := d.Get("configid").(int)
+	configid := d.Get("config_id").(int)
 	version := d.Get("version").(int)
 	err := selectedhostnames.GetSelectedHostnames(configid, version, CorrelationID)
 	if err != nil {
@@ -65,11 +65,11 @@ func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) e
 	CorrelationID := "[APPSEC][resourceSelectedHostnamesUpdate-" + CreateNonce() + "]"
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Updating SelectedHostnames")
 	selectedhostnames := appsec.NewSelectedHostnamesResponse()
-	configid := d.Get("configid").(int)
+	configid := d.Get("config_id").(int)
 	version := d.Get("version").(int)
 	hn := &appsec.SelectedHostnamesResponse{}
 
-	hostnamelist := d.Get("hostnames").([]interface{})
+	hostnamelist := d.Get("host_names").([]interface{})
 
 	for _, h := range hostnamelist {
 		m := appsec.Hostname{}

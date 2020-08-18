@@ -40,16 +40,16 @@ data "akamai_appsec_configuration" "appsecconfigedge" {
 
 
 output "configsedge" {
-  value = data.akamai_appsec_configuration.appsecconfigedge.configid
+  value = data.akamai_appsec_configuration.appsecconfigedge.config_id
 }
 
 data "akamai_appsec_selectable_hostnames" "appsecselectablehostnames" {
-    configid = data.akamai_appsec_configuration.appsecconfigedge.configid
-    version = data.akamai_appsec_configuration.appsecconfigedge.latestversion   
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    version = data.akamai_appsec_configuration.appsecconfigedge.latest_version   
 }
 
 output "selectablehostnames" {
-  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.hostnames
+  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names
 }
 
 `

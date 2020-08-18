@@ -111,3 +111,12 @@ func CreateNonce() string {
 	}
 	return uuid.String()
 }
+
+//Convert schema.Set to a slice of strings
+func setToStringSlice(s *schema.Set) []string {
+	list := make([]string, s.Len())
+	for i, v := range s.List() {
+		list[i] = v.(string)
+	}
+	return list
+}

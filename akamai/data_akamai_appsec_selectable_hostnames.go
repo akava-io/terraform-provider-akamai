@@ -14,7 +14,7 @@ func dataSourceSelectableHostnames() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceSelectableHostnamesRead,
 		Schema: map[string]*schema.Schema{
-			"configid": {
+			"config_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
@@ -22,7 +22,7 @@ func dataSourceSelectableHostnames() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"hostnames": &schema.Schema{
+			"host_names": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "JSON List of hostnames",
@@ -36,9 +36,8 @@ func dataSourceSelectableHostnamesRead(d *schema.ResourceData, meta interface{})
 
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Read SelectableHostnames")
 
-	//edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("configid  %d version %d\n", configID, version))
 	selectablehostnames := appsec.NewSelectableHostnamesResponse()
-	selectablehostnames.ConfigID = d.Get("configid").(int)
+	selectablehostnames.ConfigID = d.Get("config_id").(int)
 	selectablehostnames.ConfigVersion = d.Get("version").(int)
 
 	err := selectablehostnames.GetSelectableHostnames(CorrelationID)
@@ -53,8 +52,7 @@ func dataSourceSelectableHostnamesRead(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return err
 	}
-
-	d.Set("hostnames", string(jsonBody))
+	d.Set("host_names", string(jsonBody))
 	d.SetId(strconv.Itoa(selectablehostnames.ConfigID))
 
 	return nil

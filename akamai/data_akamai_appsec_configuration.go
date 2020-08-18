@@ -6,7 +6,6 @@ import (
 
 	appsec "github.com/akamai/AkamaiOPEN-edgegrid-golang/appsec-v1"
 	edge "github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/jsonhooks-v1"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -16,14 +15,22 @@ func dataSourceConfiguration() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
-			"latestversion": &schema.Schema{
+			"version": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"config_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"configid": &schema.Schema{
+			"latest_version": {
 				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"config_list": {
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},
@@ -35,9 +42,10 @@ func dataSourceConfigurationRead(d *schema.ResourceData, meta interface{}) error
 
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Read Configuration")
 
-	//edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("configid  %d version %d\n", configID, version))
 	configuration := appsec.NewConfigurationResponse()
+	configurationversion := appsec.NewConfigurationVersionResponse()
 	configName := d.Get("name").(string)
+	version := d.Get("version").(int)
 
 	err := configuration.GetConfiguration(CorrelationID)
 	if err != nil {
@@ -47,23 +55,39 @@ func dataSourceConfigurationRead(d *schema.ResourceData, meta interface{}) error
 
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Configuration   %v\n", configuration))
 
-	jsonBody, err := jsonhooks.Marshal(configuration)
-	if err != nil {
-		return err
-	}
-
-	d.Set("json", string(jsonBody))
+	var configlist string
+	var configidfound int
 
 	for _, configval := range configuration.Configurations {
 
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("CONFIG value  %v\n", configval.ID))
+		configurationversion.ConfigID = configval.ID
+		err := configurationversion.GetConfigurationVersion(CorrelationID)
+		if err != nil {
+			edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
+			return nil
+		}
+		configlist = configlist + " ConfigID/Name=" + strconv.Itoa(configval.ID) + "/" + configval.Name + " VersionList="
+		for _, configversionval := range configurationversion.VersionList {
+			configlist = configlist + " " + strconv.Itoa(configversionval.Version)
+		}
 		if configval.Name == configName {
 
-			d.Set("configid", configval.ID)
-			d.Set("latestversion", configval.LatestVersion)
-			d.SetId(strconv.Itoa(configval.ID))
+			for _, configversionval := range configurationversion.VersionList {
+				edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("CONFIG Version value  %v\n", configversionval.Version))
+				if configversionval.Version == version {
+					d.Set("version", strconv.Itoa(version))
+				}
+				configlist = configlist + " " + strconv.Itoa(configversionval.Version)
+			}
+
+			d.Set("config_id", configval.ID)
+			d.Set("latest_version", configval.LatestVersion)
+			configidfound = configval.ID
 		}
+		d.Set("config_list", configlist)
 	}
+	d.SetId(strconv.Itoa(configidfound))
 
 	return nil
 }

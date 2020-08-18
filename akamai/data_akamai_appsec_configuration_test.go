@@ -37,6 +37,21 @@ data "akamai_appsec_configuration" "appsecconfiguration" {
     name = "Akamai Tools"
    }
 
+output "configsedge" {
+  value = data.akamai_appsec_configuration.appsecconfigedge.config_id
+}
+
+output "configsedgelatestversion" {
+  value = data.akamai_appsec_configuration.appsecconfigedge.latest_version
+}
+
+output "configsedgeconfiglist" {
+  value = data.akamai_appsec_configuration.appsecconfigedge.config_list
+}
+
+output "configsedgeconfigversion" {
+  value = data.akamai_appsec_configuration.appsecconfigedge.version
+}
 
 `
 }

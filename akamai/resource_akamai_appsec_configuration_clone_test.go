@@ -9,7 +9,7 @@ import (
 )
 
 func TestAccAkamaiConfigurationClone_basic(t *testing.T) {
-	dataSourceName := "resource_akamai_appsec_configuration_cloneconfigurationclone"
+	//dataSourceName := "akamai_appsec_configuration_clone.appsecconfigurationclone"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -19,7 +19,8 @@ func TestAccAkamaiConfigurationClone_basic(t *testing.T) {
 			{
 				Config: testAccAkamaiConfigurationCloneConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet(dataSourceName, "id"),
+					testAccCheckAkamaiConfigurationCloneExists,
+					//resource.TestCheckResourceAttrSet(dataSourceName, "id"),
 				),
 			},
 		},
@@ -29,7 +30,7 @@ func TestAccAkamaiConfigurationClone_basic(t *testing.T) {
 func testAccAkamaiConfigurationCloneConfig() string {
 	return `
 provider "akamai" {
-  appsec_section = "appsec"
+  appsec_section = "default"
 }
  data "akamai_appsec_configuration" "appsecconfigedge" {
   name = "Example for EDGE"
@@ -39,14 +40,14 @@ provider "akamai" {
 
 
 output "configsedge" {
-  value = data.akamai_appsec_configuration.appsecconfigedge.configid
+  value = data.akamai_appsec_configuration.appsecconfigedge.config_id
 }
 
 
 resource "akamai_appsec_configuration_clone" "appsecconfigurationclone" {
-    configid = data.akamai_appsec_configuration.appsecconfigedge.configid
-    createfromversion = data.akamai_appsec_configuration.appsecconfigedge.latestversion 
-    ruleupdate  = false
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    create_from_version = data.akamai_appsec_configuration.appsecconfigedge.latest_version 
+    rule_update  = false
    }
 
 
@@ -55,7 +56,7 @@ resource "akamai_appsec_configuration_clone" "appsecconfigurationclone" {
 
 func testAccCheckAkamaiConfigurationCloneExists(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "resource_akamai_appsec_configuration_clone" {
+		if rs.Type != "akamai_appsec_configuration_clone" {
 			continue
 		}
 		//rname := rs.Primary.ID

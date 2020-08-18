@@ -43,13 +43,13 @@ data "akamai_appsec_configuration" "appsecconfigedge" {
 
 
 output "configsedge" {
-  value = data.akamai_appsec_configuration.appsecconfigedge.configid
+  value = data.akamai_appsec_configuration.appsecconfigedge.config_id
 }
 
 resource "akamai_appsec_selected_hostnames" "appsecselectedhostnames" {
-    configid = data.akamai_appsec_configuration.appsecconfigedge.configid
-    version = data.akamai_appsec_configuration.appsecconfigedge.latestversion 
-    hostnames = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"]  
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    version = data.akamai_appsec_configuration.appsecconfigedge.latest_version 
+    host_names = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"]  
 }
 
 
@@ -62,7 +62,7 @@ func testAccCheckAkamaiSelectedHostnamesExists(s *terraform.State) error {
 			continue
 		}
 		//rname := rs.Primary.ID
-		configid, _ := strconv.Atoi(rs.Primary.Attributes["configid"])
+		configid, _ := strconv.Atoi(rs.Primary.Attributes["config_id"])
 		version, _ := strconv.Atoi(rs.Primary.Attributes["version"])
 		ccresp := appsec.NewSelectedHostnamesResponse()
 		err = ccresp.GetSelectedHostnames(configid, version, "TEST")

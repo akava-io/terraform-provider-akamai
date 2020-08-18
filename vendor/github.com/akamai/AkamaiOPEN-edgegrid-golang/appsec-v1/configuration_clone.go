@@ -44,10 +44,10 @@ func NewConfigurationCloneResponse() *ConfigurationCloneResponse {
 	return ConfigurationClone_new
 }
 
-// NewConfigurationClonepost creates a new *ConfigurationClonepost
+// NewConfigurationClone_post creates a new *ConfigurationClone_post
 func NewConfigurationClonePost() *ConfigurationClonePost {
-	ConfigurationClonenew := &ConfigurationClonePost{}
-	return ConfigurationClonenew
+	ConfigurationClone_new := &ConfigurationClonePost{}
+	return ConfigurationClone_new
 }
 
 // GetConfigurationClone populates a *ConfigurationClone with it's related ConfigurationClone
@@ -125,7 +125,6 @@ func (configurationclone *ConfigurationCloneResponse) Save(postpayload *Configur
 	if client.IsError(res) {
 		return client.NewAPIError(res)
 	}
-
 	if err = client.BodyJSON(res, configurationclone); err != nil {
 		return err
 	}
