@@ -1073,7 +1073,7 @@ func extractRulesJSON(d interface{}, drules gjson.Result) []*papi.Rule {
 		if ok {
 			rule.Name, _ = vv["name"].(string)
 			rule.Comments, _ = vv["comments"].(string)
-			criteriaMustSatisfy, ok := vv["criteriaMustSatisfy"]
+			criteriaMustSatisfy, ok := vv["criteria_match"]
 			if ok {
 				if criteriaMustSatisfy.(string) == "all" {
 					rule.CriteriaMustSatisfy = papi.RuleCriteriaMustSatisfyAll
@@ -1175,7 +1175,7 @@ func extractRulesJSONDiff(d *schema.ResourceDiff, drules gjson.Result) []*papi.R
 		if ok {
 			rule.Name, _ = vv["name"].(string)
 			rule.Comments, _ = vv["comments"].(string)
-			criteriaMustSatisfy, ok := vv["criteriaMustSatisfy"]
+			criteriaMustSatisfy, ok := vv["criteria_match"]
 			if ok {
 				if criteriaMustSatisfy.(string) == "all" {
 					rule.CriteriaMustSatisfy = papi.RuleCriteriaMustSatisfyAll
@@ -1279,7 +1279,7 @@ func extractRules(drules *schema.Set) []*papi.Rule {
 			rule.Name = vv["name"].(string)
 			rule.Comments = vv["comment"].(string)
 
-			criteriaMustSatisfy, ok := vv["criteriaMustSatisfy"]
+			criteriaMustSatisfy, ok := vv["criteria_match"]
 			if ok {
 				if criteriaMustSatisfy.(string) == "all" {
 					rule.CriteriaMustSatisfy = papi.RuleCriteriaMustSatisfyAll
