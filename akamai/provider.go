@@ -7,17 +7,15 @@ import (
 	"os"
 	"strings"
 
+	appsec "github.com/akamai/AkamaiOPEN-edgegrid-golang/appsec-v1"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/client-v1"
 	dnsv2 "github.com/akamai/AkamaiOPEN-edgegrid-golang/configdns-v2"
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
-
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/appsec-v1"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/papi-v1"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/terraform-providers/terraform-provider-akamai/version"
+
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/papi-v1"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 //const (
@@ -104,7 +102,7 @@ func getConfigOptions(section string) *schema.Resource {
 }
 
 // Provider returns the Akamai terraform.Resource provider.
-func Provider() terraform.ResourceProvider {
+func Provider() *schema.Provider {
 	//client.UserAgent = client.UserAgent + " terraform/" + Version
 
 	provider := &schema.Provider{
@@ -202,6 +200,9 @@ func Provider() terraform.ResourceProvider {
 			// We can therefore assume that if it's missing it's 0.10 or 0.11
 			terraformVersion = "0.11+compatible"
 		}
+		tfUserAgent := provider.UserAgent("terraform-provider-akamai", version.ProviderVersion)
+		//providerVersion := fmt.Sprintf("terraform-provider-akamai/%s", version.ProviderVersion)
+		client.UserAgent = fmt.Sprintf("%s ", tfUserAgent)
 		return providerConfigure(d, terraformVersion)
 	}
 	return provider
@@ -222,12 +223,12 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		terraformVersion: terraformVersion,
 	}
 
-	tfUserAgent := httpclient.TerraformUserAgent(config.terraformVersion)
+	//tfUserAgent := httpclient.TerraformUserAgent(config.terraformVersion)
 	//og.Printf("[DEBUG] tfUserAgent  %s\n", tfUserAgent)
-	providerVersion := fmt.Sprintf("terraform-provider-akamai/%s", version.ProviderVersion)
+	//providerVersion := fmt.Sprintf("terraform-provider-akamai/%s", version.ProviderVersion)
 	//log.Printf("[DEBUG] providerVersion  %s\n", providerVersion)
 	//userAgent := fmt.Sprintf("%s %s", tfUserAgent, providerVersion)
-	client.UserAgent = fmt.Sprintf("%s %s", tfUserAgent, providerVersion)
+	//client.UserAgent = fmt.Sprintf("%s %s", tfUserAgent, providerVersion)
 
 	//log.Printf("[DEBUG] CLIENT UserAgent  %s\n", client.UserAgent)
 

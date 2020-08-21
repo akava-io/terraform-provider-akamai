@@ -9,7 +9,7 @@ import (
 
 	edge "github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/papi-v1"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourcePropertyActivation() *schema.Resource {
@@ -65,7 +65,7 @@ func resourcePropertyActivationCreate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	// The API now has data, so save the partial state
-	d.SetPartial("network")
+	//d.SetPartial("network")
 
 	d.Set("property", property.PropertyID)
 
