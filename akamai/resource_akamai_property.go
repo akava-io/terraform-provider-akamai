@@ -1,6 +1,7 @@
 package akamai
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -12,8 +13,8 @@ import (
 	edge "github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/jsonhooks-v1"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/papi-v1"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/tidwall/gjson"
 )
 
@@ -140,7 +141,7 @@ var akamaiPropertySchema = map[string]*schema.Schema{
 	"rules": {
 		Type:             schema.TypeString,
 		Optional:         true,
-		ValidateFunc:     validation.ValidateJsonString,
+		ValidateFunc:     validation.StringIsJSON,
 		DiffSuppressFunc: suppressEquivalentJsonDiffs,
 	},
 	"variables": {
@@ -194,14 +195,18 @@ func resourcePropertyCreate(d *schema.ResourceData, meta interface{}) error {
 
 	// The API now has data, so save the partial state
 	d.SetId(property.PropertyID)
-	d.SetPartial("name")
-	d.SetPartial("rule_format")
-	d.SetPartial("contract")
-	d.SetPartial("group")
-	d.SetPartial("product")
-	d.SetPartial("clone_from")
-	d.SetPartial("network")
-	d.SetPartial("cp_code")
+	d.Set("name", property.PropertyName)
+	//d.SetPartial("name")
+	//d.SetPartial("rule_format")
+	d.Set("rule_format", property.RuleFormat)
+	//d.SetPartial("contract")
+	d.Set("contract", property.ContractID)
+	//d.SetPartial("group")
+	d.Set("group", property.GroupID)
+	//d.SetPartial("product")
+	d.Set("product", property.ProductID)
+	//d.SetPartial("clone_from")
+	d.Set("clone_from", property.CloneFrom)
 
 	rules, err := getRules(d, property, contract, group, CorrelationID)
 	if err != nil {
@@ -218,12 +223,12 @@ func resourcePropertyCreate(d *schema.ResourceData, meta interface{}) error {
 		}
 		return err
 	}
-	d.SetPartial("default")
-	d.SetPartial("origin")
+	//d.SetPartial("default")
+	//d.SetPartial("origin")
 
 	ehnMap, err := setHostnames(property, d, CorrelationID)
 
-	d.SetPartial("ipv6")
+	//d.SetPartial("ipv6")
 	d.Set("edge_hostnames", ehnMap)
 
 	rulesAPI, err := property.GetRules(CorrelationID)
@@ -477,7 +482,7 @@ func resourcePropertyRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("rulessha", sha1hashAPI)
 
 	//d.Set("rulessha", RandStringBytesMaskImpr(8))
-	d.SetPartial("rulessha")
+	//d.SetPartial("rulessha")
 
 	if rules.RuleFormat != "" {
 		d.Set("rule_format", rules.RuleFormat)
@@ -553,12 +558,12 @@ func resourcePropertyUpdate(d *schema.ResourceData, meta interface{}) error {
 		sha1hashAPI := getSHAString(string(jsonBody))
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  UPDATE SHA from Json %s\n", sha1hashAPI))
 		d.Set("rulessha", sha1hashAPI)
-		d.SetPartial("rulessha")
+		//d.SetPartial("rulessha")
 	}
 
 	d.Set("version", property.LatestVersion)
-	d.SetPartial("default")
-	d.SetPartial("origin")
+	//d.SetPartial("default")
+	//d.SetPartial("origin")
 
 	if d.HasChange("hostnames") {
 		ehnMap, err := setHostnames(property, d, CorrelationID)
@@ -575,7 +580,7 @@ func resourcePropertyUpdate(d *schema.ResourceData, meta interface{}) error {
 	return resourcePropertyRead(d, meta)
 }
 
-func resourceCustomDiffCustomizeDiff(d *schema.ResourceDiff, meta interface{}) error {
+func resourceCustomDiffCustomizeDiff(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
 	CorrelationID := "[PAPI][resourcePropertyUpdate-" + CreateNonce() + "]"
 	//Println("[DEBUG] resourceCustomDiffCustomizeDiff " + d.Id())
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  resourceCustomDiffCustomizeDiff "+d.Id()))
