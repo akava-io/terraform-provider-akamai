@@ -201,7 +201,6 @@ func Provider() *schema.Provider {
 			terraformVersion = "0.11+compatible"
 		}
 		tfUserAgent := provider.UserAgent("terraform-provider-akamai", version.ProviderVersion)
-		//providerVersion := fmt.Sprintf("terraform-provider-akamai/%s", version.ProviderVersion)
 		client.UserAgent = fmt.Sprintf("%s ", tfUserAgent)
 		return providerConfigure(d, terraformVersion)
 	}
@@ -223,18 +222,6 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		terraformVersion: terraformVersion,
 	}
 
-	//tfUserAgent := httpclient.TerraformUserAgent(config.terraformVersion)
-	//og.Printf("[DEBUG] tfUserAgent  %s\n", tfUserAgent)
-	//providerVersion := fmt.Sprintf("terraform-provider-akamai/%s", version.ProviderVersion)
-	//log.Printf("[DEBUG] providerVersion  %s\n", providerVersion)
-	//userAgent := fmt.Sprintf("%s %s", tfUserAgent, providerVersion)
-	//client.UserAgent = fmt.Sprintf("%s %s", tfUserAgent, providerVersion)
-
-	//log.Printf("[DEBUG] CLIENT UserAgent  %s\n", client.UserAgent)
-
-	//client.UserAgent = client.UserAgent + " terraform/" + Version
-
-	//return &Config{}, nil
 	return &config, nil
 }
 
