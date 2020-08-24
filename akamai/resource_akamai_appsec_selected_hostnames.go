@@ -3,6 +3,7 @@ package akamai
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	appsec "github.com/akamai/AkamaiOPEN-edgegrid-golang/appsec-v1"
 	edge "github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
@@ -19,17 +20,19 @@ func resourceSelectedHostnames() *schema.Resource {
 		Read:   resourceSelectedHostnamesRead,
 		Update: resourceSelectedHostnamesUpdate,
 		Delete: resourceSelectedHostnamesDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		Schema: map[string]*schema.Schema{
 			"config_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
 			"version": {
-				Type:             schema.TypeInt,
-				Required:         true,
-				DiffSuppressFunc: suppressConfigurationCloneVersion,
+				Type:     schema.TypeInt,
+				Required: true,
 			},
-			"host_names": {
+			"host_names": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -43,28 +46,51 @@ func resourceSelectedHostnamesRead(d *schema.ResourceData, meta interface{}) err
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Read SelectedHostnames")
 
 	selectedhostnames := appsec.NewSelectedHostnamesResponse()
-	configid := d.Get("config_id").(int)
-	version := d.Get("version").(int)
+
+	var configid int
+	var version int
+	edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  Read SelectedHostnames D.ID %v", d.Id()))
+	if d.Id() != "" && strings.Contains(d.Id(), ":") {
+		s := strings.Split(d.Id(), ":")
+		configid, _ = strconv.Atoi(s[0])
+		version, _ = strconv.Atoi(s[1])
+	} else {
+		configid = d.Get("config_id").(int)
+		version = d.Get("version").(int)
+	}
+
 	err := selectedhostnames.GetSelectedHostnames(configid, version, CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
 		return nil
 	}
 
-	d.SetId(strconv.Itoa(configid))
+	newhdata := make([]string, 0, len(selectedhostnames.HostnameList))
+	for _, hosts := range selectedhostnames.HostnameList {
+		newhdata = append(newhdata, hosts.Hostname)
+	}
+
+	//edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  SET SelectedHostnames H %v", h))
+	d.Set("host_names", newhdata)
+	d.Set("config_id", configid)
+	d.Set("version", version)
+	d.SetId(fmt.Sprintf("%d:%d", configid, version))
 	return nil
 }
 
 func resourceSelectedHostnamesDelete(d *schema.ResourceData, meta interface{}) error {
 	CorrelationID := "[APPSEC][resourceSelectedHostnamesDelete-" + CreateNonce() + "]"
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Deleting SelectedHostnames")
+
 	return schema.Noop(d, meta)
 }
 
 func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) error {
 	CorrelationID := "[APPSEC][resourceSelectedHostnamesUpdate-" + CreateNonce() + "]"
 	edge.PrintfCorrelation("[DEBUG]", CorrelationID, "  Updating SelectedHostnames")
+
 	selectedhostnames := appsec.NewSelectedHostnamesResponse()
+
 	configid := d.Get("config_id").(int)
 	version := d.Get("version").(int)
 	hn := &appsec.SelectedHostnamesResponse{}
@@ -78,11 +104,13 @@ func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	selectedhostnames.HostnameList = hn.HostnameList
+
 	err := selectedhostnames.UpdateSelectedHostnames(configid, version, CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
 		return err
 	}
+
 	return resourceSelectedHostnamesRead(d, meta)
 
 }

@@ -11,22 +11,21 @@ import (
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/mitchellh/go-homedir"
 )
 
-var testAccProviders map[string]terraform.ResourceProvider
+var testAccProviders map[string]*schema.Provider //terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
 func init() {
-	testAccProvider = Provider().(*schema.Provider)
-	testAccProviders = map[string]terraform.ResourceProvider{
+	testAccProvider = Provider()                    //.(*schema.Provider)
+	testAccProviders = map[string]*schema.Provider{ //terraform.ResourceProvider{
 		"akamai": testAccProvider,
 	}
 }
 
 func TestProvider(t *testing.T) {
-	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
+	if err := Provider().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 }
@@ -73,7 +72,7 @@ func Test_getConfigDNSV2Service(t *testing.T) {
 		{
 			name: "no valid config",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{}),
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{}),
 			},
 			edgerc:  ``,
 			wantErr: errors.New("Unable to create instance using environment or .edgerc file"),
@@ -81,7 +80,7 @@ func Test_getConfigDNSV2Service(t *testing.T) {
 		{
 			name: "undefined .edgerc, undefined section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{}),
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{}),
 			},
 			edgerc: `[default]
 host = default
@@ -100,7 +99,7 @@ max_body = 1`,
 		{
 			name: "undefined .edgerc, default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"dns_section": "default",
 				}),
 			},
@@ -128,7 +127,7 @@ max_body = 2`,
 		{
 			name: "undefined .edgerc, not_default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"dns_section": "not_default",
 				}),
 			},
@@ -156,7 +155,7 @@ max_body = 2`,
 		{
 			name: "no edgerc dns section with env",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"dns_section": "dns",
 				}),
 			},
@@ -256,7 +255,7 @@ func Test_getPAPIV1Service(t *testing.T) {
 		{
 			name: "no valid config",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{}),
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{}),
 			},
 			edgerc:  ``,
 			wantErr: errors.New("Unable to create instance using environment or .edgerc file"),
@@ -264,7 +263,7 @@ func Test_getPAPIV1Service(t *testing.T) {
 		{
 			name: "undefined .edgerc, undefined section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{}),
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{}),
 			},
 			edgerc: `[default]
 host = default
@@ -283,7 +282,7 @@ max_body = 1`,
 		{
 			name: "undefined .edgerc, property default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"property_section": "default",
 				}),
 			},
@@ -311,7 +310,7 @@ max_body = 2`,
 		{
 			name: "undefined .edgerc, papi default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"papi_section": "default",
 				}),
 			},
@@ -339,7 +338,7 @@ max_body = 2`,
 		{
 			name: "undefined .edgerc, property not_default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"property_section": "not_default",
 				}),
 			},
@@ -367,7 +366,7 @@ max_body = 2`,
 		{
 			name: "undefined .edgerc, papi not_default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"papi_section": "not_default",
 				}),
 			},
@@ -395,7 +394,7 @@ max_body = 2`,
 		{
 			name: "no edgerc property section with env",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"property_section": "property",
 				}),
 			},
@@ -417,7 +416,7 @@ max_body = 2`,
 		{
 			name: "no edgerc papi section with env",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"papi_section": "papi",
 				}),
 			},
@@ -512,7 +511,7 @@ func Test_getGTMV1_3Service(t *testing.T) {
 		testsStruct{
 			name: "no valid config",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{}),
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{}),
 			},
 			edgerc:  ``,
 			wantErr: errors.New("Unable to create instance using environment or .edgerc file"),
@@ -520,7 +519,7 @@ func Test_getGTMV1_3Service(t *testing.T) {
 		testsStruct{
 			name: "undefined .edgerc, undefined section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{}),
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{}),
 			},
 			edgerc: `[default]
 host = default
@@ -540,7 +539,7 @@ max_body = 1`,
 		testsStruct{
 			name: "undefined .edgerc, default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"gtm_section": "default",
 				}),
 			},
@@ -568,7 +567,7 @@ max_body = 2`,
 		testsStruct{
 			name: "undefined .edgerc, not_default section",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"gtm_section": "not_default",
 				}),
 			},
@@ -596,7 +595,7 @@ max_body = 2`,
 		testsStruct{
 			name: "no edgerc gtm section with env",
 			args: args{
-				schema: schema.TestResourceDataRaw(t, Provider().(*schema.Provider).Schema, map[string]interface{}{
+				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"gtm_section": "gtm",
 				}),
 			},
