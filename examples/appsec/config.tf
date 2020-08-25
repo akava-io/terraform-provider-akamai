@@ -24,13 +24,17 @@ resource "akamai_appsec_configuration_clone" "appsecconfigurationclone" {
     create_from_version = 29 //data.akamai_appsec_configuration.appsecconfigedge.latest_version 
     rule_update  = false
    }
-
 /*
+
 data "akamai_appsec_selectable_hostnames" "appsecselectablehostnames" {
     config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
     version = data.akamai_appsec_configuration.appsecconfigedge.latest_version   
 }*/
 /*
+output "selectablehostnames" {
+  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names_json
+}
+
 output "selectablehostnames" {
   value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names
 }
@@ -64,14 +68,11 @@ output "exportconfig" {
 
 
 resource "akamai_appsec_selected_hostnames" "appsecselectedhostnames" {
-    //config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
-    //version = akamai_appsec_configuration_clone.appsecconfigurationclone.version //data.akamai_appsec_configuration.appsecconfigedge.latest_version 
     config_id = akamai_appsec_configuration_clone.appsecconfigurationclone.config_id
     version = akamai_appsec_configuration_clone.appsecconfigurationclone.version
-    //hostnames = ["*.example.net","example.com","m.example.com"]  
-    host_names = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"]  
+    host_names = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"] 
+    //host_names = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names 
    // hostnames = ["rinaldi.sandbox.akamaideveloper.com"]  
-    depends_on = ["akamai_appsec_configuration_clone.appsecconfigurationclone"]
 }
 
 /*
@@ -98,8 +99,6 @@ data "akamai_group" "group" {
 */
 
 resource "akamai_appsec_match_targets" "appsecmatchtargets" {
-    //config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
-    //version = data.akamai_appsec_configuration.appsecconfigedge.latest_version
     config_id = akamai_appsec_configuration_clone.appsecconfigurationclone.config_id
     version = akamai_appsec_configuration_clone.appsecconfigurationclone.version
     type =  "website"
@@ -112,8 +111,17 @@ resource "akamai_appsec_match_targets" "appsecmatchtargets" {
     file_paths =  ["/sssi/*","/cache/aaabbc*","/price_toy/*"]
     file_extensions = ["wmls","jpeg","pws","carb","pdf","js","hdml","cct","swf","pct"]
     security_policy = "f1rQ_106946"
-    
+
     //bypass_network_lists = ["888518_ACDDCKERS","1304427_AAXXBBLIST"]
-    depends_on = ["akamai_appsec_configuration_clone.appsecconfigurationclone"]
 }
 
+data "local_file" "rules" {
+  filename = "${path.module}/custom_rules.json"
+}
+
+
+
+resource "akamai_appsec_custom_rule" "appseccustomrule" {
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    rules = "${data.local_file.rules.content}"
+}
