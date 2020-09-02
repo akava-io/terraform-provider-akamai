@@ -11,15 +11,21 @@ cloud.google.com/go/storage
 # github.com/agext/levenshtein v1.2.2
 github.com/agext/levenshtein
 # github.com/akamai/AkamaiOPEN-edgegrid-golang v0.9.18
+## explicit
 github.com/akamai/AkamaiOPEN-edgegrid-golang/client-v1
 github.com/akamai/AkamaiOPEN-edgegrid-golang/configdns-v2
 github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4
 github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid
 github.com/akamai/AkamaiOPEN-edgegrid-golang/jsonhooks-v1
 github.com/akamai/AkamaiOPEN-edgegrid-golang/papi-v1
+# github.com/allegro/bigcache v1.2.1
+## explicit
+github.com/allegro/bigcache
+github.com/allegro/bigcache/queue
 # github.com/apparentlymart/go-textseg v1.0.0
 github.com/apparentlymart/go-textseg/textseg
 # github.com/aws/aws-sdk-go v1.30.12
+## explicit
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
 github.com/aws/aws-sdk-go/aws/awserr
@@ -79,6 +85,7 @@ github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/ptypes/timestamp
 # github.com/google/uuid v1.1.1
+## explicit
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.5
 github.com/googleapis/gax-go/v2
@@ -99,6 +106,7 @@ github.com/hashicorp/go-cty/cty/set
 github.com/hashicorp/go-getter
 github.com/hashicorp/go-getter/helper/url
 # github.com/hashicorp/go-hclog v0.9.2
+## explicit
 github.com/hashicorp/go-hclog
 # github.com/hashicorp/go-multierror v1.0.0
 github.com/hashicorp/go-multierror
@@ -121,7 +129,10 @@ github.com/hashicorp/logutils
 github.com/hashicorp/terraform-exec/tfinstall
 # github.com/hashicorp/terraform-json v0.5.0
 github.com/hashicorp/terraform-json
-# github.com/hashicorp/terraform-plugin-sdk/v2 v2.0.2-0.20200817173939-b72757e734f6
+# github.com/hashicorp/terraform-plugin-sdk v1.15.0
+## explicit
+# github.com/hashicorp/terraform-plugin-sdk/v2 v2.0.1
+## explicit
 github.com/hashicorp/terraform-plugin-sdk/v2/diag
 github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging
 github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource
@@ -153,9 +164,12 @@ github.com/jstemmer/go-junit-report/formatter
 github.com/jstemmer/go-junit-report/parser
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
+# github.com/kr/pretty v0.2.0
+## explicit
 # github.com/mitchellh/copystructure v1.0.0
 github.com/mitchellh/copystructure
 # github.com/mitchellh/go-homedir v1.1.0
+## explicit
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/go-testing-interface v1.0.4
 github.com/mitchellh/go-testing-interface
@@ -165,17 +179,31 @@ github.com/mitchellh/go-wordwrap
 github.com/mitchellh/mapstructure
 # github.com/mitchellh/reflectwalk v1.0.1
 github.com/mitchellh/reflectwalk
+# github.com/mr-tron/base58 v1.2.0
+## explicit
+github.com/mr-tron/base58
 # github.com/oklog/run v1.0.0
 github.com/oklog/run
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 github.com/patrickmn/go-cache
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
 # github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
+# github.com/smartystreets/assertions v1.0.0
+## explicit
+# github.com/stretchr/testify v1.6.1
+## explicit
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/tidwall/gjson v1.2.1
+## explicit
 github.com/tidwall/gjson
 # github.com/tidwall/match v1.0.1
+## explicit
 github.com/tidwall/match
 # github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65
+## explicit
 github.com/tidwall/pretty
 # github.com/ulikunitz/xz v0.5.7
 github.com/ulikunitz/xz
@@ -383,5 +411,15 @@ google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/emptypb
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/pluginpb
+# gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15
+## explicit
 # gopkg.in/ini.v1 v1.51.1
 gopkg.in/ini.v1
+# gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c
+## explicit
+gopkg.in/yaml.v3
+# github.com/akamai/terraform-provider-akamai/v2 => ./
+# github.com/golang/lint => golang.org/x/lint v0.0.0-20190409202823-959b441ac422
+# github.com/sourcegraph/go-diff => github.com/sourcegraph/go-diff v0.5.1
+# github.com/terraform-providers/terraform-provider-akamai => ./
+# sourcegraph.com/sourcegraph/go-diff => github.com/sourcegraph/go-diff v0.5.1

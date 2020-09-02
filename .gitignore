@@ -8,6 +8,7 @@ terraform.tfstate.backup
 # local files
 .DS_Store
 /dist
+/vendor
 
 # vscode
 .vscode/

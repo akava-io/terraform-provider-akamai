@@ -132,7 +132,7 @@ func (p *provider) Name() string {
 const ProviderVersion string = "v0.8.3"
 
 func (p *provider) Version() string {
-    return ProviderVersion
+	return ProviderVersion
 }
 
 func (p *provider) Schema() map[string]*schema.Schema {
