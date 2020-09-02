@@ -15,9 +15,9 @@ func TestAccAkamaiMatchTargets_basic(t *testing.T) {
 	dataSourceName := "akamai_appsec_match_targets.appsecmatchtargets"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		//CheckDestroy: testAccCheckAkamaiMatchTargetsDestroy,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAkamaiMatchTargetsDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAkamaiMatchTargetsConfig(),
@@ -33,16 +33,16 @@ func TestAccAkamaiMatchTargets_update(t *testing.T) {
 	dataSourceName := "akamai_appsec_match_targets.appsecmatchtargets"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		//CheckDestroy: testAccCheckAkamaiMatchTargetsDestroy,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAkamaiMatchTargetsDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAkamaiMatchTargetsConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(dataSourceName, "id"),
 					testAccCheckAkamaiMatchTargetsExists,
-					resource.TestCheckResourceAttr("akamai_appsec_match_targets.matchtargets", "host_names.#", "3"),
+					//resource.TestCheckResourceAttr("akamai_appsec_match_targets.appsecmatchtargets", "load_imbalance_percentage", "50"),
 				),
 			},
 			{
@@ -50,7 +50,7 @@ func TestAccAkamaiMatchTargets_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(dataSourceName, "id"),
 					testAccCheckAkamaiMatchTargetsExists,
-					resource.TestCheckResourceAttr("akamai_appsec_match_targets.matchtargets", "host_names.#", "2"),
+					//resource.TestCheckResourceAttr("akamai_appsec_match_targets.appsecmatchtargets", "load_imbalance_percentage", "50"),
 				),
 			},
 		},
@@ -82,7 +82,7 @@ resource "akamai_appsec_match_targets" "appsecmatchtargets" {
     is_negative_path_match =  false
     is_negative_file_extension_match =  true
     default_file = "BASE_MATCH"
-    host_names =  ["example.com","www.example.net","m.example.com"]
+    hostnames =  ["example.com","www.example.net","m.example.com"]
     //file_paths =  ["/sssi/*","/cache/aaabbc*","/price_toy/*"]
     //file_extensions = ["wmls","jpeg","pws","carb","pdf","js","hdml","cct","swf","pct"]
     security_policy = "f1rQ_106946"
@@ -119,7 +119,7 @@ resource "akamai_appsec_match_targets" "appsecmatchtargets" {
     is_negative_path_match =  false
     is_negative_file_extension_match =  true
     default_file = "BASE_MATCH"
-    host_names =  ["example.com","www.example.net"]
+    hostnames =  ["example.com","www.example.net","p.example.com"]
     //file_paths =  ["/sssi/*","/cache/aaabbc*","/price_toy/*"]
     //file_extensions = ["wmls","jpeg","pws","carb","pdf","js","hdml","cct","swf","pct"]
     security_policy = "f1rQ_106946"
@@ -138,9 +138,11 @@ func testCheckDeleteMatchTargetsResource(s *terraform.State, rscName string) err
 		}
 
 		ccresp := appsec.NewMatchTargetsResponse()
+
 		ccresp.ConfigID, _ = strconv.Atoi(rs.Primary.Attributes["config_id"])
 		ccresp.ConfigVersion, _ = strconv.Atoi(rs.Primary.Attributes["version"])
 		ccresp.TargetID, _ = strconv.Atoi(rs.Primary.ID)
+
 		err = ccresp.GetMatchTargets("TEST")
 
 		if err != nil {
@@ -148,16 +150,13 @@ func testCheckDeleteMatchTargetsResource(s *terraform.State, rscName string) err
 		}
 		log.Printf("[DEBUG] [Test] Deleting test resource [%v]", rscName)
 
-		ccresp.ConfigID, _ = strconv.Atoi(rs.Primary.Attributes["config_id"])
-		ccresp.ConfigVersion, _ = strconv.Atoi(rs.Primary.Attributes["version"])
-		ccresp.TargetID, _ = strconv.Atoi(rs.Primary.ID)
 		err = ccresp.DeleteMatchTargets("TEST")
 		if err != nil {
 			return fmt.Errorf("resource was not deleted %s. Error: %s", rscName, err.Error())
 		}
 	}
-	return nil
 
+	return nil
 }
 
 func testAccCheckAkamaiMatchTargetsDestroy(s *terraform.State) error {
@@ -172,6 +171,7 @@ func testAccCheckAkamaiMatchTargetsDestroy(s *terraform.State) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -180,6 +180,7 @@ func testAccCheckAkamaiMatchTargetsExists(s *terraform.State) error {
 		if rs.Type != "akamai_appsec_match_targets" {
 			continue
 		}
+
 		//rname := rs.Primary.ID
 
 		ccresp := appsec.NewMatchTargetsResponse()
@@ -192,5 +193,6 @@ func testAccCheckAkamaiMatchTargetsExists(s *terraform.State) error {
 			return err
 		}
 	}
+
 	return nil
 }

@@ -22,13 +22,13 @@ func dataSourceSelectableHostnames() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"host_names": {
+			"hostnames": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "List of hostnames",
 			},
-			"host_names_json": {
+			"hostnames_json": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "JSON List of hostnames",
@@ -59,7 +59,7 @@ func dataSourceSelectableHostnamesRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	d.Set("host_names_json", string(jsonBody))
+	d.Set("hostnames_json", string(jsonBody))
 
 	newhdata := make([]string, 0, len(selectablehostnames.AvailableSet))
 	for _, hosts := range selectablehostnames.AvailableSet {
@@ -67,7 +67,7 @@ func dataSourceSelectableHostnamesRead(d *schema.ResourceData, meta interface{})
 	}
 
 	//edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  SET SelectedHostnames H %v", h))
-	d.Set("host_names", newhdata)
+	d.Set("hostnames", newhdata)
 
 	d.SetId(strconv.Itoa(selectablehostnames.ConfigID))
 

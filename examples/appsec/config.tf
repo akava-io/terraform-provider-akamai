@@ -14,16 +14,31 @@ output "configs" {
 }
 */
 
-data "akamai_appsec_configuration" "appsecconfigedge" {
-  name = "Example for EDGE"
-  version = 11 
+data "akamai_appsec_security_policy" "appsecsecuritypolicy" {
+  name = "akamaitools" 
+  config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+  version =  data.akamai_appsec_configuration.appsecconfigedge.version
 }
 
+output "securitypolicy" {
+  value = data.akamai_appsec_security_policy.appsecsecuritypolicy.policy_id
+}
+
+output "securitypolicies" {
+  value = data.akamai_appsec_security_policy.appsecsecuritypolicy.policy_list
+}
+
+data "akamai_appsec_configuration" "appsecconfigedge" {
+  name = "Akamai Tools" //Example for EDGE
+  version = 3
+}
+/*
 resource "akamai_appsec_configuration_clone" "appsecconfigurationclone" {
     config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
-    create_from_version = 29 //data.akamai_appsec_configuration.appsecconfigedge.latest_version 
-    rule_update  = false
+    create_from_version = data.akamai_appsec_configuration.appsecconfigedge.version 
+    rule_update  = true
    }
+*/
 /*
 
 data "akamai_appsec_selectable_hostnames" "appsecselectablehostnames" {
@@ -32,11 +47,11 @@ data "akamai_appsec_selectable_hostnames" "appsecselectablehostnames" {
 }*/
 /*
 output "selectablehostnames" {
-  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names_json
+  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.hostnames_json
 }
 
 output "selectablehostnames" {
-  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names
+  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.hostnames
 }
 */
 output "configsedge" {
@@ -66,14 +81,15 @@ output "exportconfig" {
   value = data.akamai_appsec_export_configuration.export.json
 }*/
 
-
+/* 
 resource "akamai_appsec_selected_hostnames" "appsecselectedhostnames" {
     config_id = akamai_appsec_configuration_clone.appsecconfigurationclone.config_id
     version = akamai_appsec_configuration_clone.appsecconfigurationclone.version
-    host_names = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"] 
-    //host_names = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names 
+    hostnames = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"] 
+    //hostnames = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.hostnames 
    // hostnames = ["rinaldi.sandbox.akamaideveloper.com"]  
 }
+*/
 
 /*
 resource "akamai_appsec_security_policy_clone" "appsecsecuritypolicyclone" {
@@ -97,7 +113,7 @@ data "akamai_contract" "contract" {
 data "akamai_group" "group" {
 }
 */
-
+/*
 resource "akamai_appsec_match_targets" "appsecmatchtargets" {
     config_id = akamai_appsec_configuration_clone.appsecconfigurationclone.config_id
     version = akamai_appsec_configuration_clone.appsecconfigurationclone.version
@@ -107,7 +123,7 @@ resource "akamai_appsec_match_targets" "appsecmatchtargets" {
     is_negative_path_match =  false
     is_negative_file_extension_match =  true
     default_file = "NO_MATCH" //"BASE_MATCH" //NO_MATCH
-    host_names =  ["example.com","www.example.net","n.example.com"]
+    hostnames =  ["example.com","www.example.net","n.example.com"]
     file_paths =  ["/sssi/*","/cache/aaabbc*","/price_toy/*"]
     file_extensions = ["wmls","jpeg","pws","carb","pdf","js","hdml","cct","swf","pct"]
     security_policy = "f1rQ_106946"
@@ -124,4 +140,14 @@ data "local_file" "rules" {
 resource "akamai_appsec_custom_rule" "appseccustomrule" {
     config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
     rules = "${data.local_file.rules.content}"
+}
+*/
+
+resource "akamai_appsec_activations" "appsecactivations" {
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    version = 4 //data.akamai_appsec_configuration.appsecconfigedge.version
+    network = "STAGING"
+    notes  = "TEST Notes"
+    activate = true
+    notification_emails = ["martin@akava.io"]
 }

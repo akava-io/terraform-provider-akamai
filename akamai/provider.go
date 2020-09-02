@@ -169,6 +169,7 @@ func Provider() *schema.Provider {
 			"akamai_appsec_configuration":        dataSourceConfiguration(),
 			"akamai_appsec_export_configuration": dataSourceExportConfiguration(),
 			"akamai_appsec_selectable_hostnames": dataSourceSelectableHostnames(),
+			"akamai_appsec_security_policy":      dataSourceSecurityPolicy(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"akamai_cp_code":                      resourceCPCode(),
@@ -191,6 +192,7 @@ func Provider() *schema.Provider {
 			"akamai_appsec_security_policy_clone": resourceSecurityPolicyClone(),
 			"akamai_appsec_match_targets":         resourceMatchTargets(),
 			"akamai_appsec_custom_rule":           resourceCustomRule(),
+			"akamai_appsec_activations":           resourceActivations(),
 		},
 	}
 	//ConfigureFunc: providerConfigure,

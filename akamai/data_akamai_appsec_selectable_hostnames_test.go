@@ -49,7 +49,7 @@ data "akamai_appsec_selectable_hostnames" "appsecselectablehostnames" {
 }
 
 output "selectablehostnames" {
-  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.host_names
+  value = data.akamai_appsec_selectable_hostnames.appsecselectablehostnames.hostnames
 }
 
 `

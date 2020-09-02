@@ -32,7 +32,7 @@ func resourceSelectedHostnames() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"host_names": &schema.Schema{
+			"hostnames": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -71,7 +71,7 @@ func resourceSelectedHostnamesRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("  SET SelectedHostnames H %v", h))
-	d.Set("host_names", newhdata)
+	d.Set("hostnames", newhdata)
 	d.Set("config_id", configid)
 	d.Set("version", version)
 	d.SetId(fmt.Sprintf("%d:%d", configid, version))
@@ -95,7 +95,7 @@ func resourceSelectedHostnamesUpdate(d *schema.ResourceData, meta interface{}) e
 	version := d.Get("version").(int)
 	hn := &appsec.SelectedHostnamesResponse{}
 
-	hostnamelist := d.Get("host_names").([]interface{})
+	hostnamelist := d.Get("hostnames").([]interface{})
 
 	for _, h := range hostnamelist {
 		m := appsec.Hostname{}

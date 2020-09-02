@@ -57,6 +57,7 @@ func dataSourceConfigurationRead(d *schema.ResourceData, meta interface{}) error
 
 	var configlist string
 	var configidfound int
+	configlist = configlist + " ConfigID Name  VersionList" + "\n"
 
 	for _, configval := range configuration.Configurations {
 
@@ -67,10 +68,14 @@ func dataSourceConfigurationRead(d *schema.ResourceData, meta interface{}) error
 			edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
 			return nil
 		}
-		configlist = configlist + " ConfigID/Name=" + strconv.Itoa(configval.ID) + "/" + configval.Name + " VersionList="
+
+		//configlist = configlist + " ConfigID/Name=" + strconv.Itoa(configval.ID) + "/" + configval.Name + " VersionList="
+		configlist = configlist + "\n" + strconv.Itoa(configval.ID) + " " + configval.Name
 		for _, configversionval := range configurationversion.VersionList {
 			configlist = configlist + " " + strconv.Itoa(configversionval.Version)
 		}
+		configlist = configlist + "\n"
+
 		if configval.Name == configName {
 
 			for _, configversionval := range configurationversion.VersionList {
@@ -78,7 +83,7 @@ func dataSourceConfigurationRead(d *schema.ResourceData, meta interface{}) error
 				if configversionval.Version == version {
 					d.Set("version", strconv.Itoa(version))
 				}
-				configlist = configlist + " " + strconv.Itoa(configversionval.Version)
+				//	configlist = configlist + " " + strconv.Itoa(configversionval.Version)
 			}
 
 			d.Set("config_id", configval.ID)

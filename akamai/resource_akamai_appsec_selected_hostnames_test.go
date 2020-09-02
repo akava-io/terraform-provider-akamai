@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	appsec "github.com/akamai/AkamaiOPEN-edgegrid-golang/appsec-v1"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccAkamaiSelectedHostnames_basic(t *testing.T) {
@@ -49,7 +49,7 @@ output "configsedge" {
 resource "akamai_appsec_selected_hostnames" "appsecselectedhostnames" {
     config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
     version = data.akamai_appsec_configuration.appsecconfigedge.latest_version 
-    host_names = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"]  
+    hostnames = ["rinaldi.sandbox.akamaideveloper.com","sujala.sandbox.akamaideveloper.com"]  
 }
 
 
@@ -71,5 +71,6 @@ func testAccCheckAkamaiSelectedHostnamesExists(s *terraform.State) error {
 			return err
 		}
 	}
+
 	return nil
 }

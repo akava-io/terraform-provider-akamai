@@ -78,7 +78,7 @@ type ExportConfigurationResponse struct {
 				ApplySlowPostControls         bool `json:"applySlowPostControls"`
 			} `json:"effectiveSecurityControls"`
 			FilePaths                    []string `json:"filePaths"`
-			Hostnames                    []string `json:"host_names"`
+			Hostnames                    []string `json:"hostNames"`
 			ID                           int      `json:"id"`
 			IsNegativeFileExtensionMatch bool     `json:"isNegativeFileExtensionMatch"`
 			IsNegativePathMatch          bool     `json:"isNegativePathMatch"`
