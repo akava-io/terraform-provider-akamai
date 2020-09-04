@@ -1,6 +1,7 @@
 package appsec
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -29,6 +30,12 @@ func resourceMatchTargets() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"json": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"type", "sequence", "is_negative_path_match", "is_negative_file_extension_match", "default_file", "hostnames", "file_paths", "file_extensions", "security_policy", "bypass_network_lists"},
+			},
+
 			"target_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -36,47 +43,56 @@ func resourceMatchTargets() *schema.Resource {
 
 			"type": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"sequence": {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:          schema.TypeInt,
+				Optional:      true,
+				ConflictsWith: []string{"json"},
 			},
 			"is_negative_path_match": {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:          schema.TypeBool,
+				Optional:      true,
+				ConflictsWith: []string{"json"},
 			},
 			"is_negative_file_extension_match": {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:          schema.TypeBool,
+				Optional:      true,
+				ConflictsWith: []string{"json"},
 			},
 			"default_file": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"json"},
 			},
-			"hostnames": {
-				Type:     schema.TypeSet,
-				Required: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			"hostnames": &schema.Schema{
+				Type:          schema.TypeSet,
+				Optional:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"json"},
 			},
-			"file_paths": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			"file_paths": &schema.Schema{
+				Type:          schema.TypeSet,
+				Optional:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"json"},
 			},
-			"file_extensions": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			"file_extensions": &schema.Schema{
+				Type:          schema.TypeSet,
+				Optional:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"json"},
 			},
 			"security_policy": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"json"},
 			},
-			"bypass_network_lists": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			"bypass_network_lists": &schema.Schema{
+				Type:          schema.TypeSet,
+				Optional:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"json"},
 			},
 		},
 	}
@@ -88,23 +104,29 @@ func resourceMatchTargetsCreate(d *schema.ResourceData, meta interface{}) error 
 
 	matchtargets := appsec.NewMatchTargetsResponse()
 
-	matchtargets.ConfigID = d.Get("config_id").(int)
-	matchtargets.ConfigVersion = d.Get("version").(int)
-	matchtargets.Type = d.Get("type").(string)
-	matchtargets.Sequence = d.Get("sequence").(int)
-	matchtargets.IsNegativePathMatch = d.Get("is_negative_path_match").(bool)
-	matchtargets.IsNegativeFileExtensionMatch = d.Get("is_negative_file_extension_match").(bool)
-	matchtargets.DefaultFile = d.Get("default_file").(string)
-	matchtargets.Hostnames = tools.SetToStringSlice(d.Get("hostnames").(*schema.Set))
-	matchtargets.FilePaths = tools.SetToStringSlice(d.Get("file_paths").(*schema.Set))
-	matchtargets.FileExtensions = tools.SetToStringSlice(d.Get("file_extensions").(*schema.Set))
-	matchtargets.SecurityPolicy.PolicyID = d.Get("security_policy").(string)
-	bypassnetworklists := d.Get("bypass_network_lists").(*schema.Set).List()
+	jsonpostpayload, ok := d.GetOk("json")
+	if ok {
 
-	for _, b := range bypassnetworklists {
-		bl := appsec.BypassNetworkList{}
-		bl.ID = b.(string)
-		matchtargets.BypassNetworkLists = append(matchtargets.BypassNetworkLists, bl)
+		json.Unmarshal([]byte(jsonpostpayload.(string)), &matchtargets)
+	} else {
+		matchtargets.ConfigID = d.Get("config_id").(int)
+		matchtargets.ConfigVersion = d.Get("version").(int)
+		matchtargets.Type = d.Get("type").(string)
+		matchtargets.Sequence = d.Get("sequence").(int)
+		matchtargets.IsNegativePathMatch = d.Get("is_negative_path_match").(bool)
+		matchtargets.IsNegativeFileExtensionMatch = d.Get("is_negative_file_extension_match").(bool)
+		matchtargets.DefaultFile = d.Get("default_file").(string)
+		matchtargets.Hostnames = tools.SetToStringSlice(d.Get("host_names").(*schema.Set))
+		matchtargets.FilePaths = tools.SetToStringSlice(d.Get("file_paths").(*schema.Set))
+		matchtargets.FileExtensions = tools.SetToStringSlice(d.Get("file_extensions").(*schema.Set))
+		matchtargets.SecurityPolicy.PolicyID = d.Get("security_policy").(string)
+		bypassnetworklists := d.Get("bypass_network_lists").(*schema.Set).List()
+
+		for _, b := range bypassnetworklists {
+			bl := appsec.BypassNetworkList{}
+			bl.ID = b.(string)
+			matchtargets.BypassNetworkLists = append(matchtargets.BypassNetworkLists, bl)
+		}
 	}
 
 	postresp, err := matchtargets.SaveMatchTargets(CorrelationID)
@@ -124,24 +146,29 @@ func resourceMatchTargetsUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	matchtargets := appsec.NewMatchTargetsResponse()
 
-	matchtargets.ConfigID = d.Get("config_id").(int)
-	matchtargets.ConfigVersion = d.Get("version").(int)
-	matchtargets.Type = d.Get("type").(string)
-	matchtargets.Sequence = d.Get("sequence").(int)
-	matchtargets.IsNegativePathMatch = d.Get("is_negative_path_match").(bool)
-	matchtargets.IsNegativeFileExtensionMatch = d.Get("is_negative_file_extension_match").(bool)
-	matchtargets.DefaultFile = d.Get("default_file").(string)
-	matchtargets.Hostnames = tools.SetToStringSlice(d.Get("hostnames").(*schema.Set))
-	matchtargets.FilePaths = tools.SetToStringSlice(d.Get("file_paths").(*schema.Set))
-	matchtargets.FileExtensions = tools.SetToStringSlice(d.Get("file_extensions").(*schema.Set))
-	matchtargets.SecurityPolicy.PolicyID = d.Get("security_policy").(string)
-	matchtargets.TargetID, _ = strconv.Atoi(d.Id())
-	bypassnetworklists := d.Get("bypass_network_lists").(*schema.Set).List()
+	jsonpostpayload, ok := d.GetOk("json")
+	if ok {
 
-	for _, b := range bypassnetworklists {
-		bl := appsec.BypassNetworkList{}
-		bl.ID = b.(string)
-		matchtargets.BypassNetworkLists = append(matchtargets.BypassNetworkLists, bl)
+		json.Unmarshal([]byte(jsonpostpayload.(string)), &matchtargets)
+	} else {
+		matchtargets.ConfigID = d.Get("config_id").(int)
+		matchtargets.ConfigVersion = d.Get("version").(int)
+		matchtargets.Type = d.Get("type").(string)
+		matchtargets.Sequence = d.Get("sequence").(int)
+		matchtargets.IsNegativePathMatch = d.Get("is_negative_path_match").(bool)
+		matchtargets.IsNegativeFileExtensionMatch = d.Get("is_negative_file_extension_match").(bool)
+		matchtargets.DefaultFile = d.Get("default_file").(string)
+		matchtargets.Hostnames = tools.SetToStringSlice(d.Get("host_names").(*schema.Set))
+		matchtargets.FilePaths = tools.SetToStringSlice(d.Get("file_paths").(*schema.Set))
+		matchtargets.FileExtensions = tools.SetToStringSlice(d.Get("file_extensions").(*schema.Set))
+		matchtargets.SecurityPolicy.PolicyID = d.Get("security_policy").(string)
+		bypassnetworklists := d.Get("bypass_network_lists").(*schema.Set).List()
+
+		for _, b := range bypassnetworklists {
+			bl := appsec.BypassNetworkList{}
+			bl.ID = b.(string)
+			matchtargets.BypassNetworkLists = append(matchtargets.BypassNetworkLists, bl)
+		}
 	}
 
 	err := matchtargets.UpdateMatchTargets(CorrelationID)
