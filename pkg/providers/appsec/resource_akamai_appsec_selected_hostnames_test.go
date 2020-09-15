@@ -65,7 +65,7 @@ func testAccCheckAkamaiSelectedHostnamesExists(s *terraform.State) error {
 		configid, _ := strconv.Atoi(rs.Primary.Attributes["config_id"])
 		version, _ := strconv.Atoi(rs.Primary.Attributes["version"])
 		ccresp := appsec.NewSelectedHostnamesResponse()
-		err = ccresp.GetSelectedHostnames(configid, version, "TEST")
+		err := ccresp.GetSelectedHostnames(configid, version, "TEST")
 
 		if err != nil {
 			return err

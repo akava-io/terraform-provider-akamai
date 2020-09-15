@@ -61,7 +61,7 @@ func testAccCheckAkamaiSecurityPolicyCloneExists(s *terraform.State) error {
 		}
 		//rname := rs.Primary.ID
 		ccresp := appsec.NewSecurityPolicyCloneResponse()
-		_, err = ccresp.GetSecurityPolicyClone("TEST")
+		_, err := ccresp.GetSecurityPolicyClone("TEST")
 
 		if err != nil {
 			return err

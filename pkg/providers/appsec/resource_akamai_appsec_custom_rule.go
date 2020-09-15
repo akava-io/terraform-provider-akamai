@@ -50,14 +50,14 @@ func resourceCustomRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	jsonpostpayload := d.Get("rules").(string)
 	json.Unmarshal([]byte(jsonpostpayload), &customrule)
 
-	postresp, err := customrule.SaveCustomRule(configid, CorrelationID)
+	err := customrule.SaveCustomRule(configid, CorrelationID)
 	if err != nil {
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("Error  %v\n", err))
 		return err
 	}
 
-	d.Set("rule_id", postresp.ID)
-	d.SetId(strconv.Itoa(postresp.ID))
+	d.Set("rule_id", customrule.ID)
+	d.SetId(strconv.Itoa(customrule.ID))
 
 	return resourceCustomRuleRead(d, meta)
 }

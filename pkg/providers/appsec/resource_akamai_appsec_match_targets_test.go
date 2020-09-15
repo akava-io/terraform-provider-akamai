@@ -143,7 +143,7 @@ func testCheckDeleteMatchTargetsResource(s *terraform.State, rscName string) err
 		ccresp.ConfigVersion, _ = strconv.Atoi(rs.Primary.Attributes["version"])
 		ccresp.TargetID, _ = strconv.Atoi(rs.Primary.ID)
 
-		err = ccresp.GetMatchTargets("TEST")
+		err := ccresp.GetMatchTargets("TEST")
 
 		if err != nil {
 			return err
@@ -187,7 +187,7 @@ func testAccCheckAkamaiMatchTargetsExists(s *terraform.State) error {
 		ccresp.ConfigID, _ = strconv.Atoi(rs.Primary.Attributes["config_id"])
 		ccresp.ConfigVersion, _ = strconv.Atoi(rs.Primary.Attributes["version"])
 		ccresp.TargetID, _ = strconv.Atoi(rs.Primary.ID)
-		err = ccresp.GetMatchTargets("TEST")
+		err := ccresp.GetMatchTargets("TEST")
 
 		if err != nil {
 			return err

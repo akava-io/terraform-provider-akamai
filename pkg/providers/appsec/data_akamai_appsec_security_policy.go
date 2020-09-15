@@ -64,10 +64,7 @@ func dataSourceSecurityPolicyRead(d *schema.ResourceData, meta interface{}) erro
 		edge.PrintfCorrelation("[DEBUG]", CorrelationID, fmt.Sprintf("CONFIG value  %v\n", configval.PolicyID))
 		secpolicylist = append(secpolicylist, configval.PolicyID)
 		if configval.PolicyName == configName {
-
 			d.Set("policy_id", configval.PolicyID)
-			//d.Set("version", configval.LatestVersion)
-			//d.SetId(securitypolicy.ConfigID)
 		}
 	}
 

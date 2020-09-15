@@ -1,7 +1,7 @@
 {
     "type": "website",
-    "configId": 39085,
-    "configVersion": 25,
+    "configId": 43253,
+    "configVersion": 5,
     "defaultFile": "NO_MATCH",
     "effectiveSecurityControls": {
         "applyApplicationLayerControls": true,
@@ -36,7 +36,7 @@
     "isNegativeFileExtensionMatch": true,
     "isNegativePathMatch": false,
     "securityPolicy": {
-        "policyId": "f1rQ_106946"
+        "policyId": "AAAA_81230"
     },
     "sequence": 1
 }

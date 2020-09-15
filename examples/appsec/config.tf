@@ -1,6 +1,7 @@
 provider "akamai" {
   edgerc = "~/.edgerc"
-  appsec_section = "global"
+  alias = "appsec"
+  //appsec_section = "global"
 }
 
 /*
@@ -13,7 +14,7 @@ output "configs" {
   value = data.akamai_appsec_configuration.appsecconfig.config_id
 }
 */
-
+/*
 data "akamai_appsec_security_policy" "appsecsecuritypolicy" {
   name = "akamaitools" 
   config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
@@ -27,6 +28,7 @@ output "securitypolicy" {
 output "securitypolicies" {
   value = data.akamai_appsec_security_policy.appsecsecuritypolicy.policy_list
 }
+*/
 
 data "akamai_appsec_configuration" "appsecconfigedge" {
   name = "Akamai Tools" //Example for EDGE
@@ -70,16 +72,35 @@ output "configsedgeconfigversion" {
   value = data.akamai_appsec_configuration.appsecconfigedge.version
 }
 
-/*
-data "akamai_appsec_export_configuration" "export" {
+data "akamai_appsec_configuration_version" "appsecconfigversion" {
+  config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+  version = 1
+  
+}
+
+output "configversion" {
+  value = data.akamai_appsec_configuration_version.appsecconfigversion.version_list
+}
+
+output "configversionstagingstatus" {
+  value = data.akamai_appsec_configuration_version.appsecconfigversion.staging_status
+}
+
+output "configversionproductionstatus" {
+  value = data.akamai_appsec_configuration_version.appsecconfigversion.production_status
+}
+
+/*data "akamai_appsec_export_configuration" "export" {
   config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
   version = data.akamai_appsec_configuration.appsecconfigedge.latest_version
+  search = ["ruleActions","securityPolicies","selectedHosts.tf","selectedHosts","customRules","rulesets","reputationProfiles","ratePolicies","matchTargets"] //"selectableHosts"
   
 }
 
 output "exportconfig" {
-  value = data.akamai_appsec_export_configuration.export.json
-}*/
+  value = data.akamai_appsec_export_configuration.export.output_text
+}
+*/
 
 /* 
 resource "akamai_appsec_selected_hostnames" "appsecselectedhostnames" {
@@ -115,11 +136,14 @@ data "akamai_group" "group" {
 */
 /*
 resource "akamai_appsec_match_targets" "appsecmatchtargets" {
-    config_id = akamai_appsec_configuration_clone.appsecconfigurationclone.config_id
-    version = akamai_appsec_configuration_clone.appsecconfigurationclone.version
-    type =  "website"
-    //json =  file("${path.module}/match_targets.json")
-    sequence =  1
+  config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+  version = data.akamai_appsec_configuration.appsecconfigedge.latest_version
+  
+ //   config_id = akamai_appsec_configuration_clone.appsecconfigurationclone.config_id
+  //  version = akamai_appsec_configuration_clone.appsecconfigurationclone.version
+   // type =  "website"
+    json =  file("${path.module}/match_targets.json")
+     sequence =  1
     is_negative_path_match =  false
     is_negative_file_extension_match =  true
     default_file = "NO_MATCH" //"BASE_MATCH" //NO_MATCH
@@ -130,19 +154,24 @@ resource "akamai_appsec_match_targets" "appsecmatchtargets" {
 
     //bypass_network_lists = ["888518_ACDDCKERS","1304427_AAXXBBLIST"]
 }
+*/
 
 data "local_file" "rules" {
-  filename = "${path.module}/custom_rules.json"
+  filename = "${path.module}/custom_rules_simple.json"
 }
-
-
 
 resource "akamai_appsec_custom_rule" "appseccustomrule" {
     config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
-    rules = "${data.local_file.rules.content}"
+    rules = data.local_file.rules.content
 }
-*/
 
+resource "akamai_appsec_custom_rule" "appseccustomrule1" {
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    rules = file("${path.module}/custom_rules_simple1.json")
+}
+
+
+/*
 resource "akamai_appsec_activations" "appsecactivations" {
     config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
     version = 4 //data.akamai_appsec_configuration.appsecconfigedge.version
@@ -150,4 +179,12 @@ resource "akamai_appsec_activations" "appsecactivations" {
     notes  = "TEST Notes"
     activate = true
     notification_emails = ["martin@akava.io"]
+}*/
+
+
+resource "akamai_appsec_rate_policy" "appsecratepolicy" {
+    config_id = data.akamai_appsec_configuration.appsecconfigedge.config_id
+    version_number = data.akamai_appsec_configuration.appsecconfigedge.latest_version
+    json =  file("${path.module}/rate_policy.json")
+    
 }

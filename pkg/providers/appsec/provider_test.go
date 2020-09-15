@@ -157,7 +157,7 @@ max_body = 2`,
 			},
 		},
 		{
-			name: "no edgerc dns section with env",
+			name: "no edgerc appsec section with env",
 			args: args{
 				schema: schema.TestResourceDataRaw(t, Provider().Schema, map[string]interface{}{
 					"appsec_section": "appsec",
@@ -228,16 +228,16 @@ max_body = 2`,
 				}
 			}
 
-			got, err := getConfigDNSV2Service(tt.args.schema)
+			got, err := getAPPSECV1Service(tt.args.schema)
 			if err != nil {
 				if reflect.DeepEqual(err, tt.wantErr) {
 					return
 				}
-				t.Errorf("getConfigDNSV2Service() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getAPPSECV1Service() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getConfigDNSV2Service() = %v, want %v", got, tt.want)
+				t.Errorf("getAPPSECV1Service() = %v, want %v", got, tt.want)
 			}
 		})
 	}
